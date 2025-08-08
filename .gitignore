@@ -1,0 +1,8 @@
+tests/
+.idea/
+.venv/
+code_analysis.docx
+*.db
+README_GR.md
+usage_guide.docx
+users.yaml
