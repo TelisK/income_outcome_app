@@ -51,7 +51,7 @@ datetime
 ## Run the App
 
 ```bash
-streamlit run Income_Outcome_App.py
+streamlit run Income_Outcome_App_EN.py
 ```
 
 The app will automatically launch in your default web browser (e.g., [http://localhost:8501](http://localhost:8501)).
