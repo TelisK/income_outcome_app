@@ -1,5 +1,5 @@
 from typing import Annotated
-from models import Income
+from models import Income, Expenses
 from pydantic import BaseModel, validator, field_validator
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, Body, HTTPException
@@ -51,6 +51,13 @@ class IncomeUpdateRequest(BaseModel):
     class Config:
         from_attributes = True
 
+class ExpensesRequest(BaseModel):
+    date: date
+    expenses: float
+
+class ExpensesUpdateRequest(BaseModel):
+    expenses: float
+
 @app.get('/', response_model=list[IncomeResponse], status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(Income).all()
@@ -85,4 +92,35 @@ async def delete_income(db: db_dependency, date: date):
     if income_model is None:
         raise HTTPException(status_code=404, detail='Wrong Date')
     db.query(Income).filter(Income.date == date).delete()
+    db.commit()
+
+@app.get('/expenses', response_model=list[ExpensesRequest], status_code=status.HTTP_200_OK)
+async def read_all(db: db_dependency):
+    return db.query(Expenses).all()
+
+@app.post('/expenses', status_code=status.HTTP_201_CREATED)
+async def set_expenses(db: db_dependency, expenses_request: ExpensesRequest):
+    expenses_model = Expenses(**expenses_request.model_dump())
+    db.add(expenses_model)
+    db.commit()
+
+@app.put('/expenses/{date}', status_code=status.HTTP_204_NO_CONTENT)
+async def update_expenses(db: db_dependency, expenses_request: ExpensesUpdateRequest, date: date):
+    if date is None:
+        raise HTTPException(status_code=400, detail='Bad Request')
+    expenses_model = db.query(Expenses).filter(Expenses.date == date).first()
+    if expenses_model is None:
+        raise HTTPException(status_code=404, detail='Wrong Date')
+    expenses_model.expenses = expenses_request.expenses
+    db.add(expenses_model)
+    db.commit()
+
+@app.delete('/expenses/{date}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_expenses(db: db_dependency, date: date):
+    if date is None:
+        raise HTTPException(status_code=400, detail='Bad Request')
+    expenses_model = db.query(Expenses).filter(Expenses.date == date).first()
+    if expenses_model is None:
+        raise HTTPException(status_code=404, detail='Wrong Date')
+    db.query(Expenses).filter(Expenses.date == date).delete()
     db.commit()
