@@ -1,6 +1,6 @@
 from typing import Annotated
 from models import Income, Expenses
-from pydantic import BaseModel, validator, field_validator
+from pydantic import BaseModel, validator, field_validator, Field
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, Body, HTTPException, UploadFile, File
 from database import SessionLocal, Base, engine
@@ -28,8 +28,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 class IncomeRequest(BaseModel):
     date: date
-    income_cash : float
-    income_pos : float
+    income_cash : float = Field(gt=0)
+    income_pos : float = Field(gt=0)
     income : float | None = None
 
     @validator('income', always=True)
@@ -42,27 +42,27 @@ class IncomeRequest(BaseModel):
 class IncomeResponse(BaseModel):
     id: int
     date: date
-    income_cash: float
-    income_pos: float
-    income: float
+    income_cash: float = Field(gt=0)
+    income_pos: float = Field(gt=0)
+    income: float = Field(gt=0)
 
     class Config:
         from_attributes = True
 
 class IncomeUpdateRequest(BaseModel):
-    income_cash: float
-    income_pos: float
-    income: float
+    income_cash: float = Field(gt=0)
+    income_pos: float = Field(gt=0)
+    income: float = Field(gt=0)
 
     class Config:
         from_attributes = True
 
 class ExpensesRequest(BaseModel):
     date: date
-    expenses: float
+    expenses: float = Field(gt=0)
 
 class ExpensesUpdateRequest(BaseModel):
-    expenses: float
+    expenses: float = Field(gt=0)
 
 @app.get('/', response_model=list[IncomeResponse], status_code=status.HTTP_200_OK)
 async def read_all_income(db: db_dependency):
@@ -102,6 +102,8 @@ async def set_income(db: db_dependency, income_request: IncomeRequest):
     db.add(income_model)
     db.commit()
 
+
+#ΔΕΣ CHATGPT ΓΙΑ ΝΑ ΣΥΝΕΧΙΣΕΙΣ
 '''@app.post('/income/by_image', status_code=status.HTTP_201_CREATED)
 async def by_image(db : db_dependency, file : UploadFile = File(...)):
     content = await file.read()
