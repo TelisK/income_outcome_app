@@ -153,7 +153,22 @@ async def read_all_expenses(db: db_dependency):
 
 @app.get('/date_reports/expenses/{start_date}/{end_date}', status_code=status.HTTP_200_OK)
 async def read_date_range_expenses(db: db_dependency, start_date: date, end_date: date):
-    return db.query(Expenses).filter(Expenses.date >= start_date).filter(Expenses.date <= end_date).all()
+    result =  db.query(Expenses).filter(Expenses.date >= start_date).filter(Expenses.date <= end_date).all()
+
+    start_end_dates = []
+    expenses = []
+    start_end_dates.append(str(result[0].date))
+    start_end_dates.append(str(result[-1].date))
+
+    for i in range(len(result)):
+        expenses.append(result[i].expenses)
+        to_return = {
+            'Start_Date' : start_end_dates[0],
+            'End_Date' : start_end_dates[1],
+            'Expenses' : sum(expenses)
+        }
+
+    return to_return, result
 
 
 @app.post('/expenses', status_code=status.HTTP_201_CREATED)
