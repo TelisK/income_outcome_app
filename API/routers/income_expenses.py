@@ -29,6 +29,7 @@ class IncomeRequest(BaseModel):
     income_pos: float = Field(gt=0)
     income: float | None = None
 
+# with this it adds automaticaly income_cash with income_pos and gives us the income
     @validator('income', always=True)
     def set_income(cls, v, values):
         if v is None:

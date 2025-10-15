@@ -11,7 +11,8 @@ class Users(Base):
     last_name = Column(String)
     hashed_password = Column(String)
     active = Column(Boolean, default=True)
-    role = Column(Enum('admin', 'user', name='user_roles'), default='user')
+    role = Column(Enum('admin', 'user', name='user_roles'), default='user') # Enum didn't work. i added a different role and it was succesfull. CHECK IT
+
 
 class Income(Base):
     __tablename__ = 'income'
