@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from database import SessionLocal
 from datetime import date
 from starlette import status
+from .auth import get_current_user
 
 
 router = APIRouter()
@@ -21,6 +22,7 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 class IncomeRequest(BaseModel):
@@ -67,7 +69,11 @@ class ExpensesUpdateRequest(BaseModel):
 
 
 @router.get('/', response_model=list[IncomeResponse], status_code=status.HTTP_200_OK)
-async def read_all_income(db: db_dependency):
+async def read_all_income(user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+    if user.get('username') != 'admin':
+        raise HTTPException(status_code=401, detail='User has no admin rights')
     return db.query(Income).all()
 
 
@@ -99,7 +105,9 @@ async def read_date_range_income(db: db_dependency, start_date: date, end_date: 
 
 
 @router.post('/income', status_code=status.HTTP_201_CREATED)
-async def set_income(db: db_dependency, income_request: IncomeRequest):
+async def set_income(user: user_dependency, db: db_dependency, income_request: IncomeRequest):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
     income_model = Income(**income_request.model_dump())
     db.add(income_model)
     db.commit()
