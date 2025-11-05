@@ -1,12 +1,12 @@
-
-# Daily Income & Expense Management (UPDATED WITH API)
+# Daily Income & Expense Management (+ API)
 
 ## Description
 
 The application is written in Python using Streamlit and allows for the entry of daily income (cash & POS) and expenses, as well as the display of aggregated data and statistics through interactive Altair charts.  
 All data is stored in a local SQLite database (`income_outcome.db`).
 
-Additionally, the project now includes a FastAPI-based backend API that provides authentication, data access, and management endpoints for the same dataset.
+In addition to the Streamlit app, the project now includes a separate API module built with FastAPI.  
+The API provides authentication, user management, and endpoints for income and expense data.
 
 ---
 
@@ -16,13 +16,8 @@ Additionally, the project now includes a FastAPI-based backend API that provides
 |------|-----------|-------------|
 | Income Entry | Enter Cash & POS | Select date, automatic total calculation, check/replace existing entry |
 | Expense Entry | Enter Expenses | Select date, check/replace existing entry |
-| View Totals | Period Report | Detailed list of income and expenses, totals and average |
+| View Totals | Period Report | Detailed list of income and expenses, totals and averages |
 | View Statistics | Charts | Filters: date range, month, year; select income/expenses; compare across months |
-
-The API also provides endpoints for:
-- User authentication and role-based access control (admin, user)
-- CRUD operations for income and expenses
-- Date range reports and summaries
 
 ---
 
@@ -110,7 +105,9 @@ passlib[bcrypt]
 
 ---
 
-## Run the Streamlit App
+## Streamlit Application
+
+### Run the App
 
 ```
 
@@ -121,9 +118,21 @@ streamlit run Income_Outcome_App_EN.py
 The app will automatically launch in your default web browser, usually at  
 http://localhost:8501
 
+### User Guide
+
+1. Enter Income: Select a date, enter cash & POS amounts, click "Submit Income".  
+2. Enter Expenses: Same process for expense data.  
+3. View Totals: Set a date range and click "Display".  
+4. View Statistics: Select period & data type to display interactive charts.
+
 ---
 
-## Run the FastAPI Backend
+## API Module (FastAPI Backend)
+
+The `API/` folder contains a standalone FastAPI backend that provides authentication and RESTful access to the income and expense data.  
+It supports JWT authentication, role-based access control (`admin`, `user`), and date range reporting.
+
+### Run the API
 
 ```
 
@@ -135,27 +144,23 @@ uvicorn main:app --reload
 The API will be available at  
 http://localhost:8000
 
-Swagger documentation is automatically available at  
+Swagger documentation:  
 http://localhost:8000/docs  
-and ReDoc documentation at  
+ReDoc documentation:  
 http://localhost:8000/redoc
 
 ---
 
-## API Overview
+### API Overview
 
-The API provides endpoints for user management and CRUD operations for income and expenses.
-
-### Authentication Endpoints
+#### Authentication Endpoints
 
 | Method | Endpoint | Description |
 |---------|-----------|-------------|
 | POST | `/auth/` | Create a new user |
 | POST | `/auth/token` | Obtain JWT access token |
 
-#### Create User Example
-
-Request body:
+Example - Create User:
 ```json
 {
   "username": "admin",
@@ -167,33 +172,9 @@ Request body:
 }
 ````
 
-#### Get Token Example
-
-Request (x-www-form-urlencoded):
-
-```
-username=admin
-password=1234
-```
-
-Response:
-
-```json
-{
-  "access_token": "<JWT_TOKEN>",
-  "token_type": "bearer"
-}
-```
-
-Authenticated requests must include:
-
-```
-Authorization: Bearer <JWT_TOKEN>
-```
-
 ---
 
-### Income Endpoints
+#### Income Endpoints
 
 | Method | Endpoint                                | Description                         |
 | ------ | --------------------------------------- | ----------------------------------- |
@@ -205,7 +186,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-### Expenses Endpoints
+#### Expenses Endpoints
 
 | Method | Endpoint                                         | Description                          |
 | ------ | ------------------------------------------------ | ------------------------------------ |
@@ -217,7 +198,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-## Example Workflow
+### Example Workflow
 
 ```
 # Login to obtain a token
@@ -242,16 +223,6 @@ Content-Type: application/json
 
 ---
 
-## User Guide (Streamlit)
-
-1. Enter Income: Select a date, enter cash & POS amounts, click "Submit Income".
-2. Enter Expenses: Same process for expense data.
-3. View Totals: Set a date range and click "Display".
-4. View Statistics: Select period & data type to display interactive charts.
-
----
-
 ## License
 
 This project is licensed under the MIT License.
-
