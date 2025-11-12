@@ -8,6 +8,11 @@ All data is stored in a local SQLite database (`income_outcome.db`).
 In addition to the Streamlit app, the project now includes a separate API module built with FastAPI.  
 The API provides authentication, user management, and endpoints for income and expense data.
 
+## Project Presentation
+This project was developed as part of a university course.  
+Watch the official presentation video on the professor’s YouTube channel (Greek Language):
+https://www.youtube.com/watch?v=_u3T-ewSns0&t=5s
+
 ---
 
 ## Features
